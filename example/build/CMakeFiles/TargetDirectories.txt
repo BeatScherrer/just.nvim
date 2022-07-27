@@ -1,3 +1,0 @@
-/home/beat/workspace/git/beat/just.nvim/example/build/CMakeFiles/main.dir
-/home/beat/workspace/git/beat/just.nvim/example/build/CMakeFiles/edit_cache.dir
-/home/beat/workspace/git/beat/just.nvim/example/build/CMakeFiles/rebuild_cache.dir
