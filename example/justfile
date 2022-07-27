@@ -1,0 +1,8 @@
+setup:
+  ./build.sh
+
+build: setup
+  cd build && make
+
+clean: 
+  cd build && rm -rf *

@@ -1,11 +1,12 @@
 default:
-  echo "default"
+  echo "hello from default"
+  zsh -ic "echo 'test error' >&2"
 
 build:
-  echo "build"
+  echo "hello from build"
 
 test:
-  echo "test"
+  echo "hello from test"
 
 lint: 
-  echo "lint"
+  echo "hello from lint"
