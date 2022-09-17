@@ -18,7 +18,7 @@ local utils = require("just.utils")
 
 local M = {}
 
-local justSummary = Job:new({
+local justSummaryJob = Job:new({
 	command = "just",
 	args = { "--summary" },
 })
@@ -28,62 +28,56 @@ local justList = Job:new({
 	args = { "--list" },
 })
 
--- Strip the lines of any ansi terminal color codes
-local sanitize = function(lines)
-	for i = 1, #lines do
-		lines[i] = (lines[i]):gsub(string.char(27) .. "[[0-9;]*m]", "")
+local function completeRecipe(args)
+	-- Match the command line arguments to all the available recipes and sugges
+	-- those that contain the arguments
+
+	local suggestionList = {}
+
+	justSummaryJob:sync()
+	local justRecipes = utils.splitString(justSummaryJob:result()[1], " ")
+
+	for _, recipe in pairs(justRecipes) do
+		if string.find(recipe, args) then
+			table.insert(suggestionList, recipe)
+			utils.printTable(suggestionList)
+		end
 	end
+
+	return suggestionList
 end
 
-M.setup = function(opts)
-	vim.api.nvim_create_user_command("Just", function(opts)
-		local stdout_results = {}
-		local stderr_results = {}
+M.setup = function(_)
+	vim.api.nvim_create_user_command("Just", function(args)
+		-- No parameter passed
+		if not args.fargs[1] then
+			justList:sync()
+			return
+		end
 
 		local justJob = Job:new({
 			command = "just",
-			args = { opts.fargs[1] },
-			-- is this callback broken, or how is it properly used to get stoud?
-			on_stdout = function(data, line)
-				if data then
-					table.insert(data)
-				end
-				table.insert(stdout_results, line)
+			args = { args.fargs[1] },
+			on_stdout = function(_, lines)
+				utils.appendToQuickfix(lines)
 			end,
-			on_stderr = function(data, line)
-				if data then
-					table.insert(data)
+			on_stderr = vim.schedule_wrap(function(_, lines)
+				print(lines)
+				utils.appendToQuickfix(lines)
+			end),
+			on_exit = vim.schedule_wrap(function(_, return_val)
+				if return_val == 0 then
+					print("success")
+				else
+					print("failure")
+					utils.openQuickfix()
 				end
-				table.insert(stderr_results, line)
-			end,
+			end),
 		})
-		justJob:sync() -- Synchronous for now
-
-		print("a")
-
-		utils.printTable(stdout_results)
-		utils.printTable(stderr_results)
-
-		-- vim.fn.setqflist({}, "a", {
-		-- 	lines = sanitize(stdout_results),
-		-- 	efm = "%m",
-		-- })
-		vim.fn.setqflist({}, "a", {
-			lines = stderr_results,
-			-- efm = "./%f: line %l: %m",
-			efm = "%f: line %l: %m, error: Recipe %m failed on line %l",
-		})
-
-		-- only open the quickfix if there are errors
-		if #stderr_results > 0 then
-			vim.api.nvim_command("copen")
-		end
+		justJob:start()
 	end, {
 		nargs = "*",
-		complete = function()
-			justSummary:sync() -- or start()
-			return utils.splitString(justSummary:result()[1], " ")
-		end,
+		complete = completeRecipe,
 	})
 end
 
