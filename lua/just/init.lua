@@ -31,7 +31,6 @@ local justList = Job:new({
 local function completeRecipe(args)
 	-- Match the command line arguments to all the available recipes and sugges
 	-- those that contain the arguments
-
 	local suggestionList = {}
 
 	justSummaryJob:sync()
@@ -40,7 +39,6 @@ local function completeRecipe(args)
 	for _, recipe in pairs(justRecipes) do
 		if string.find(recipe, args) then
 			table.insert(suggestionList, recipe)
-			utils.printTable(suggestionList)
 		end
 	end
 

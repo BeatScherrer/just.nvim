@@ -34,4 +34,23 @@ function M.sanitize(lines)
 	end
 end
 
+function M.completeRecipe(args)
+	-- Match the command line arguments to all the available recipes and sugges
+	-- those that contain the arguments
+
+	local suggestionList = {}
+
+	justSummaryJob:sync()
+	local justRecipes = utils.splitString(justSummaryJob:result()[1], " ")
+
+	for _, recipe in pairs(justRecipes) do
+		if string.find(recipe, args) then
+			table.insert(suggestionList, recipe)
+			utils.printTable(suggestionList)
+		end
+	end
+
+	return suggestionList
+end
+
 return M
