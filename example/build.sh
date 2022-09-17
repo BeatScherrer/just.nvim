@@ -11,8 +11,6 @@ function main() {
     mkdir build
   fi
 
-  echo $a
-
   cd build
   cmake ../
   make

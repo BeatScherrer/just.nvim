@@ -38,11 +38,10 @@ end
 ---@param arg any Arguments to add to the quickfix list.
 function M.appendToQuickfix(arg)
 	print("appending to quickfix: " .. arg)
-	vim.fn.setqflist({}, "a", {
-		lines = arg,
-		-- efm = "./%f: line %l: %m",
-		efm = "%f: line %l: %m, error: Recipe %m failed on line %l",
-	})
+	local item = {
+		text = arg,
+	}
+	vim.fn.setqflist({ item }, "a")
 end
 
 ---Sets the quickfix list title.

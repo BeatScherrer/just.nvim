@@ -49,29 +49,33 @@ M.setup = function(_)
 	vim.api.nvim_create_user_command("Just", function(args)
 		-- No parameter passed
 		if not args.fargs[1] then
-			justList:sync()
+			utils.printTable(justList:sync())
 			return
 		end
 
+		local recipeName = args.fargs[1]
+
 		local justJob = Job:new({
 			command = "just",
-			args = { args.fargs[1] },
-			on_stdout = function(_, lines)
+			args = { recipeName },
+			on_stdout = vim.schedule_wrap(function(_, lines)
 				utils.appendToQuickfix(lines)
-			end,
+			end),
 			on_stderr = vim.schedule_wrap(function(_, lines)
-				print(lines)
 				utils.appendToQuickfix(lines)
 			end),
 			on_exit = vim.schedule_wrap(function(_, return_val)
 				if return_val == 0 then
-					print("success")
+					print("success: " .. recipeName)
 				else
-					print("failure")
+					print("failed: " .. recipeName)
 					utils.openQuickfix()
 				end
 			end),
 		})
+
+		utils.clearQuickfix()
+		utils.setQuickfixTitle("Just recipe: " .. args.fargs[1])
 		justJob:start()
 	end, {
 		nargs = "*",
