@@ -48,4 +48,5 @@ If an error occurrs in the passed recipe the quickfix is automatically opened.
 # TODO:
 - [ ] Add config to not open the quickfix on error
 - [ ] Improve the error messages in the just project
+- [ ] Come up with a strategy to handle multiple arguments when using the telescope extension
 
