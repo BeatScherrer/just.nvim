@@ -2,6 +2,19 @@
 
 A [just](https://github.com/casey/just) command runner plugin for [neovim](https://github.com/neovim/neovim).
 
+## Prerequisites
+Install the `just` command runner
+
+### Arch Linux
+```
+sudo pacman -S just
+```
+
+### MacOS
+```
+brew install just
+```
+
 ## Getting started
 ### Packer
 ```
@@ -32,7 +45,7 @@ Example:
 If an error occurrs in the passed recipe the quickfix is automatically opened.
 
 
-#TODO:
+# TODO:
 - [ ] Add config to not open the quickfix on error
 - [ ] Improve the error messages in the just project
 

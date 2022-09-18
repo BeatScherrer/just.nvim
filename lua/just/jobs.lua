@@ -6,6 +6,7 @@ local M = {}
 ---Get a list of the just summary (i.e. just recipes)
 ---@return table List containing just summary
 M.justSummary = function()
+	-- TODO handle case where no justfile is present
 	local justRecipes = Job:new({
 		command = "just",
 		args = { "--summary" },

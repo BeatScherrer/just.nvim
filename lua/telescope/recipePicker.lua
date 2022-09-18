@@ -31,6 +31,6 @@ M.recipePicker = function(opts)
 		:find()
 end
 
-M.recipePicker()
+--M.recipePicker() --use this for debugging this file directly
 
 return M
