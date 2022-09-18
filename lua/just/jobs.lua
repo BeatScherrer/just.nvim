@@ -1,5 +1,4 @@
 local utils = require("just.utils")
-
 local Job = require("plenary.job")
 
 local M = {}

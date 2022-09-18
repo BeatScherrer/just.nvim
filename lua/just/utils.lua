@@ -6,7 +6,7 @@ function M.printTable(argument)
 	print(vim.inspect(argument))
 end
 
----comment Reloads the plugin.
+---Reloads the plugin.
 function M.reloadPlugin()
 	require("plenary.reload").reload_module("just")
 end

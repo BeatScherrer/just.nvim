@@ -1,17 +1,14 @@
--- to run the picker just call `luafile %`
-
-local M = {}
-
-local Job = require("plenary.job")
-local jobs = require("just.jobs")
-local utils = require("just.utils")
-
+-- note: to run the picker for testing just call `luafile %`
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local config = require("telescope.config").values
 
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
+
+local jobs = require("just.jobs")
+
+local M = {}
 
 M.recipePicker = function(opts)
 	opts = opts or {}
