@@ -30,14 +30,12 @@ end
 
 ---comment Clears the quickfix window.
 function M.clearQuickfix()
-	print("clearing quickfix")
 	vim.fn.setqflist({}, "r")
 end
 
 ---comment Appends items to the quickfix list.
 ---@param arg any Arguments to add to the quickfix list.
 function M.appendToQuickfix(arg)
-	print("appending to quickfix: " .. arg)
 	local item = {
 		text = arg,
 	}

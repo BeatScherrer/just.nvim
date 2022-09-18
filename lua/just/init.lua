@@ -13,28 +13,17 @@
 -- Another approach would be to have just output a unified error format and set the error format in neovim to that...
 
 local Job = require("plenary.job")
+local jobs = require("just.jobs")
 
 local utils = require("just.utils")
 
 local M = {}
 
-local justSummaryJob = Job:new({
-	command = "just",
-	args = { "--summary" },
-})
-
-local justList = Job:new({
-	command = "just",
-	args = { "--list" },
-})
-
 local function completeRecipe(args)
 	-- Match the command line arguments to all the available recipes and sugges
 	-- those that contain the arguments
 	local suggestionList = {}
-
-	justSummaryJob:sync()
-	local justRecipes = utils.splitString(justSummaryJob:result()[1], " ")
+	local justRecipes = jobs.justSummary()
 
 	for _, recipe in pairs(justRecipes) do
 		if string.find(recipe, args) then
@@ -49,34 +38,16 @@ M.setup = function(_)
 	vim.api.nvim_create_user_command("Just", function(args)
 		-- No parameter passed
 		if not args.fargs[1] then
-			utils.printTable(justList:sync())
+			utils.printTable(jobs.justList())
 			return
 		end
 
+		-- TODO handle multiple arguments
 		local recipeName = args.fargs[1]
-
-		local justJob = Job:new({
-			command = "just",
-			args = { recipeName },
-			on_stdout = vim.schedule_wrap(function(_, lines)
-				utils.appendToQuickfix(lines)
-			end),
-			on_stderr = vim.schedule_wrap(function(_, lines)
-				utils.appendToQuickfix(lines)
-			end),
-			on_exit = vim.schedule_wrap(function(_, return_val)
-				if return_val == 0 then
-					print("success: " .. recipeName)
-				else
-					print("failed: " .. recipeName)
-					utils.openQuickfix()
-				end
-			end),
-		})
 
 		utils.clearQuickfix()
 		utils.setQuickfixTitle("Just recipe: " .. args.fargs[1])
-		justJob:start()
+		jobs.justRunAsync(recipeName, true)
 	end, {
 		nargs = "*",
 		complete = completeRecipe,
