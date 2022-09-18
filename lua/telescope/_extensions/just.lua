@@ -4,6 +4,6 @@ return require("telescope").register_extension({
 	-- end,
 	exports = {
 		-- Export plugin stuff here
-		justRecipes = require("telescope.recipePicker"),
+		just = require("telescope.recipePicker").recipePicker,
 	},
 })
