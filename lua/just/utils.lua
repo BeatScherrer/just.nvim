@@ -1,6 +1,6 @@
 local M = {}
 
----comment Helper to print a table.
+---Helper to print a table.
 ---@param argument table Table to print.
 function M.printTable(argument)
 	print(vim.inspect(argument))
@@ -11,7 +11,7 @@ function M.reloadPlugin()
 	require("plenary.reload").reload_module("just")
 end
 
----comment Splits a string by a given delimiter.
+---Splits a string by a given delimiter.
 ---@param input string Text to split.
 ---@param separator string Delimiter at which the splits are made.
 ---@return table Table of split strings.
@@ -23,17 +23,17 @@ function M.splitString(input, separator)
 	return words
 end
 
----comment Opens the quickfix window.
+---Opens the quickfix window.
 function M.openQuickfix()
 	vim.api.nvim_command("copen")
 end
 
----comment Clears the quickfix window.
+---Clears the quickfix window.
 function M.clearQuickfix()
 	vim.fn.setqflist({}, "r")
 end
 
----comment Appends items to the quickfix list.
+---Appends items to the quickfix list.
 ---@param arg any Arguments to add to the quickfix list.
 function M.appendToQuickfix(arg)
 	local item = {
@@ -50,7 +50,7 @@ function M.setQuickfixTitle(arg)
 	})
 end
 
----comment Removes color codes from a string
+---Removes color codes from a string
 ---@param lines string String to sanitize.
 function M.sanitize(lines)
 	for i = 1, #lines do

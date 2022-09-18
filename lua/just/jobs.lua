@@ -4,7 +4,7 @@ local Job = require("plenary.job")
 
 local M = {}
 
----comment Get a list of the just summary (i.e. just recipes)
+---Get a list of the just summary (i.e. just recipes)
 ---@return table List containing just summary
 M.justSummary = function()
 	local justRecipes = Job:new({
@@ -15,7 +15,7 @@ M.justSummary = function()
 	return utils.splitString(justRecipes[1], " ")
 end
 
----comment Returns a list with the available just recipes.
+---Returns a list with the available just recipes.
 ---@return unknown List of the just recipe names.
 M.justList = function()
 	local list = Job:new({
@@ -25,7 +25,7 @@ M.justList = function()
 	return list
 end
 
----comment Runs a just recipe asynchronously.
+---Runs a just recipe asynchronously.
 ---@param recipeName any Recipe name to run.
 ---@param autoStart any Whether the job should ran automatically (default=true)
 ---@return unknown Job handle
