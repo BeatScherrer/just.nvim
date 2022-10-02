@@ -26,10 +26,11 @@ end
 ---Opens the quickfix window.
 ---@param filename string Optional name of the error file.
 function M.openQuickfix(filename)
-	if not arg then
+	if not filename then
 		vim.api.nvim_command("copen")
 	else
 		vim.api.nvim_command("cfile " .. filename)
+		vim.api.nvim_command("copen")
 	end
 end
 
