@@ -53,6 +53,7 @@ M.justRunAsync = function(recipeName, autoStart)
 				print("success: " .. recipeName)
 			else
 				print("failed: " .. recipeName)
+				-- TODO make opening quickfix automatically configurable
 				utils.openQuickfix(filename)
 			end
 		end),

@@ -6,6 +6,14 @@ function M.printTable(argument)
 	print(vim.inspect(argument))
 end
 
+---Runs a vim command silently and redraws.
+---@param command string Vim command to execute.
+function M.silentCommand(command)
+	vim.api.nvim_command("silent " .. command)
+	-- vim.api.nvim_command(command)
+	vim.api.nvim_command("redraw!")
+end
+
 ---Reloads the plugin.
 function M.reloadPlugin()
 	require("plenary.reload").reload_module("just")
@@ -29,7 +37,8 @@ function M.openQuickfix(filename)
 	if not filename then
 		vim.api.nvim_command("copen")
 	else
-		vim.api.nvim_command("cfile " .. filename)
+		-- vim.api.nvim_command("cfile " .. filename)
+		M.silentCommand("cfile " .. filename)
 		vim.api.nvim_command("copen")
 	end
 end
