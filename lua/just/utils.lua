@@ -24,8 +24,13 @@ function M.splitString(input, separator)
 end
 
 ---Opens the quickfix window.
-function M.openQuickfix()
-	vim.api.nvim_command("copen")
+---@param filename string Optional name of the error file.
+function M.openQuickfix(filename)
+	if not arg then
+		vim.api.nvim_command("copen")
+	else
+		vim.api.nvim_command("cfile " .. filename)
+	end
 end
 
 ---Clears the quickfix window.
@@ -38,6 +43,7 @@ end
 function M.appendToQuickfix(arg)
 	local item = {
 		text = arg,
+		-- pattern = vim.opt.errorformat._value,
 	}
 	vim.fn.setqflist({ item }, "a")
 end
@@ -55,6 +61,29 @@ end
 function M.sanitize(lines)
 	for i = 1, #lines do
 		lines[i] = (lines[i]):gsub(string.char(27) .. "[[0-9;]*m]", "")
+	end
+end
+
+---Appends @param arg to the file @param file
+---@param file string Name of the file.
+---@param arg string Contect to append to the file @param file.
+function M.appendToFile(file, arg)
+	local out = io.open(file, "a")
+	if out then
+		out:write(arg)
+		out:write("\n")
+		out:close()
+	else
+		vim.notify("could not open file: " .. file)
+	end
+end
+
+---Clears the content of the file @param file.
+---@param file string Path of the file to clear.
+function M.clearFile(file)
+	local out = io.open(file, "w")
+	if out then
+		out:write()
 	end
 end
 

@@ -34,21 +34,26 @@ M.justRunAsync = function(recipeName, autoStart)
 		autoStart = true
 	end
 
+	-- TODO make this
+	local filename = "/tmp/just_" .. recipeName .. ".txt"
+
+	utils.clearFile(filename)
+
 	local job = Job:new({
 		command = "just",
 		args = { recipeName },
 		on_stdout = vim.schedule_wrap(function(_, lines)
-			utils.appendToQuickfix(lines)
+			utils.appendToFile(filename, lines)
 		end),
 		on_stderr = vim.schedule_wrap(function(_, lines)
-			utils.appendToQuickfix(lines)
+			utils.appendToFile(filename, lines)
 		end),
 		on_exit = vim.schedule_wrap(function(_, return_val)
 			if return_val == 0 then
 				print("success: " .. recipeName)
 			else
 				print("failed: " .. recipeName)
-				utils.openQuickfix()
+				utils.openQuickfix(filename)
 			end
 		end),
 	})
