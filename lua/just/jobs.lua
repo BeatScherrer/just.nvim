@@ -11,18 +11,42 @@ M.justSummary = function()
 		command = "just",
 		args = { "--summary" },
 	}):sync()
-	utils.printTable(justRecipes)
-	return utils.splitString(justRecipes[1], " ")
 end
+return utils.splitString(justRecipes[1], " ")
 
 ---Returns a list with the available just recipes.
----@return unknown List of the just recipe names.
+---@return List of the just recipe names together with the arguments.
 M.justList = function()
+	-- TODO: this could probably be done more elegantly
+	local justRecipes = {}
+
 	local list = Job:new({
 		command = "just",
 		args = { "--list" },
 	}):sync()
-	return list
+
+	-- remove first entry with 'Available recipes':
+	table.remove(list, 1)
+
+	for i, v in pairs(list) do
+		local leading_ws = string.match(v, "^%s+")
+		v = string.sub(v, #leading_ws + 1)
+
+		-- split the sanitized string again to get the arguments
+    local recipe_parts = utils.splitString(v, " ")
+
+		-- add the recipe key
+		justRecipes[recipe_parts[1]] = { arguments = {} }
+
+		-- add the arguments to the recipe
+		for i, word in pairs(recipe_parts) do
+			if i ~= 1 then
+				table.insert(justRecipes[recipe_parts[1]].arguments, word)
+			end
+		end
+	end
+
+	return justRecipes
 end
 
 ---Runs a just recipe asynchronously.

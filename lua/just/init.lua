@@ -52,4 +52,7 @@ M.setup = function(_)
 	})
 end
 
+-- TODO: setup with options in user code instead of here
+M.setup()
+
 return M

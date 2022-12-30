@@ -97,4 +97,9 @@ function M.clearFile(file)
 	end
 end
 
+function M.openInput()
+	local input = vim.fn.input("Enter a string: ")
+	vim.notify(input)
+end
+
 return M
