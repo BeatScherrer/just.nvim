@@ -97,21 +97,59 @@ function M.clearFile(file)
 	end
 end
 
-function M.openInput()
-	local input = vim.fn.input("Enter a string: ")
-	vim.notify(input)
+function M.openFloatingWindow()
+	-- TODO: some parts of this function can be extracted
+	local ui = vim.api.nvim_list_uis()[1]
 
-	local win = vim.api.nvim_open_win(0, true, {
+	if not ui then
+		vim.notify("could not retrieve the dimensions of the current ui!")
+		return
+	end
+
+	local win_width = 50
+	local win_height = 10
+
+	local win_row = math.floor((ui.height - win_height) / 2)
+	local win_col = math.floor((ui.width - win_width) / 2)
+
+	local options = {
 		relative = "editor",
-		row = 5,
-		col = 5,
-		width = 30,
-		height = 5,
+		width = win_width,
+		height = win_height,
+		row = win_row,
+		col = win_col,
+		anchor = "NW",
 		style = "minimal",
-	})
+	}
 
-	vim.api.nvim_buf_set_lines(win, 0, -1, true, { "enter a value: " })
-	vim.api.nvim_buf_set_keymap(win, "i", "<CR>", ":q<CR>", { noremap = true })
+	-- create a new buffer
+	local buf = vim.api.nvim_create_buf(false, true)
+
+	-- TODO make border configurable
+	-- set the border
+	local border_char = "─"
+	local lines = {}
+
+	-- add top border
+	local top_line = "╭" .. string.rep(border_char, win_width - 2) .. "╮"
+	local middle_line = "│" .. string.rep(" ", win_width - 2) .. "│"
+	local bottom_line = "╰" .. string.rep(border_char, win_width - 2) .. "╯"
+
+	table.insert(lines, top_line)
+	for _ = 2, win_height - 1 do
+		table.insert(lines, middle_line)
+	end
+	table.insert(lines, bottom_line)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+
+	vim.api.nvim_open_win(buf, true, options)
+
+	return buf
+end
+
+function M.openInput()
+	-- TODO pass on actions and data to the floating window
+	M.openFloatingWindow()
 end
 
 return M

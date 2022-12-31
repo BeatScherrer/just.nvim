@@ -68,7 +68,16 @@ M.recipePicker = function(opts)
 				actions.select_default:replace(function()
 					actions.close(prompt_bufnr)
 					local selection = action_state.get_selected_entry()
-					jobs.justRunAsync(selection[1])
+
+					utils.printTable(selection)
+
+					for _, v in ipairs(selection.value.arguments) do
+						print(v)
+						utils.openInput()
+						-- prompt the argument
+					end
+
+					-- jobs.justRunAsync(selection[1])
 				end)
 				return true
 			end,
