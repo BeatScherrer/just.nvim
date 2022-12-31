@@ -33,16 +33,34 @@ M.recipePicker = function(opts)
 		end
 	end
 
-	utils.printTable(recipes)
+	local entry_maker = function(entry)
+		local arguments = ""
+		for _, v in ipairs(entry.arguments) do
+			arguments = arguments .. " " .. v
+		end
+
+		local value = entry
+		local display = ""
+
+		if #entry.arguments ~= 0 then
+			display = entry.name .. ": " .. arguments
+		else
+			display = entry.name
+		end
+
+		return {
+			value = value,
+			display = display,
+			ordinal = display,
+		}
+	end
 
 	pickers
 		.new(opts, {
 			prompt_tile = "Just Recipes",
 			finder = finders.new_table({
 				results = recipes,
-				entry_maker = function(entry)
-					return { value = entry, display = entry.name, ordinal = entry.name }
-				end,
+				entry_maker = entry_maker,
 			}),
 			sorter = config.generic_sorter(opts),
 			attach_mappings = function(prompt_bufnr, _)
