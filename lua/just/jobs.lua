@@ -11,8 +11,8 @@ M.justSummary = function()
 		command = "just",
 		args = { "--summary" },
 	}):sync()
+	return utils.splitString(justRecipes[1], " ")
 end
-return utils.splitString(justRecipes[1], " ")
 
 ---Returns a list with the available just recipes.
 ---@return List of the just recipe names together with the arguments.
@@ -33,7 +33,7 @@ M.justList = function()
 		v = string.sub(v, #leading_ws + 1)
 
 		-- split the sanitized string again to get the arguments
-    local recipe_parts = utils.splitString(v, " ")
+		local recipe_parts = utils.splitString(v, " ")
 
 		-- add the recipe key
 		justRecipes[recipe_parts[1]] = { arguments = {} }
