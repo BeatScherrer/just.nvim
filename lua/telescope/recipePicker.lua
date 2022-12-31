@@ -6,16 +6,44 @@ local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
 local jobs = require("just.jobs")
+local utils = require("just.utils")
 
 local M = {}
 
 M.recipePicker = function(opts)
 	opts = opts or {}
 
+	-- get the recipes
+	local recipes = jobs.justList()
+
+	-- construct a list of recipes together with the arguments
+	local recipeList = {}
+	for recipe, v in pairs(recipes) do
+		local args = ""
+
+		-- utils.printTable(recipes)
+		-- utils.printTable(v.arguments)
+		if #v.arguments ~= 0 then
+			for _, arg in pairs(v.arguments) do
+				args = args .. " " .. arg
+			end
+			table.insert(recipeList, recipe .. ": " .. args)
+		else
+			table.insert(recipeList, recipe)
+		end
+	end
+
+	utils.printTable(recipes)
+
 	pickers
 		.new(opts, {
 			prompt_tile = "Just Recipes",
-			finder = finders.new_table(jobs.justSummary()),
+			finder = finders.new_table({
+				results = recipes,
+				entry_maker = function(entry)
+					return { value = entry, display = entry.name, ordinal = entry.name }
+				end,
+			}),
 			sorter = config.generic_sorter(opts),
 			attach_mappings = function(prompt_bufnr, _)
 				-- Select Default

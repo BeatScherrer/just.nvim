@@ -34,17 +34,22 @@ M.justList = function()
 
 		-- split the sanitized string again to get the arguments
 		local recipe_parts = utils.splitString(v, " ")
+		local recipe_name = recipe_parts[1]
 
-		-- add the recipe key
-		justRecipes[recipe_parts[1]] = { arguments = {} }
+		-- add the recipe table
+		local recipe = { name = recipe_name, arguments = {} }
 
 		-- add the arguments to the recipe
 		for i, word in pairs(recipe_parts) do
 			if i ~= 1 then
-				table.insert(justRecipes[recipe_parts[1]].arguments, word)
+				table.insert(recipe.arguments, word)
 			end
 		end
+
+		table.insert(justRecipes, recipe)
 	end
+
+	-- we want an array with a table for each recipe holding keys with: name, arguments, etc.
 
 	return justRecipes
 end

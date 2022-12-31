@@ -100,6 +100,18 @@ end
 function M.openInput()
 	local input = vim.fn.input("Enter a string: ")
 	vim.notify(input)
+
+	local win = vim.api.nvim_open_win(0, true, {
+		relative = "editor",
+		row = 5,
+		col = 5,
+		width = 30,
+		height = 5,
+		style = "minimal",
+	})
+
+	vim.api.nvim_buf_set_lines(win, 0, -1, true, { "enter a value: " })
+	vim.api.nvim_buf_set_keymap(win, "i", "<CR>", ":q<CR>", { noremap = true })
 end
 
 return M
