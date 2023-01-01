@@ -121,10 +121,8 @@ function M.openFloatingWindow(width, height, opts)
 		enter = true,
 		minheight = height,
 		minwidth = width,
-		line = 0,
-		col = 0,
 		noautocmd = true,
-		border = { 1, 1, 1, 1 },
+		border = { 0, 0, 0, 0 },
 		borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
 	}
 
@@ -149,7 +147,7 @@ function M.openFloatingWindow(width, height, opts)
 
 	-- vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "123456", "12", "123" })
 
-	return buf
+	return win_id, win_opts
 end
 
 function M.deleteBuffer(buffer)
