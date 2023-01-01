@@ -151,7 +151,12 @@ function M.setBorder(buffer, width, height)
 	local col = math.floor((width - strings.strdisplaywidth(lines[2])) / 2)
 end
 
-function M.openFloatingWindow(width, height)
+function M.openFloatingWindow(width, height, opts)
+	opts = opts or {}
+	opts.normal_hl = vim.F.if_nil(opts.normal_hl, "JustPrompt")
+	opts.border_hl = vim.F.if_nil(opts.border_hl, "JustPromptBorder")
+	opts.winblend = vim.F.if_nil(opts.winblend, 1)
+
 	local options = {
 		title = { { text = "test title", pos = "S" } },
 		relative = "editor",
@@ -165,23 +170,25 @@ function M.openFloatingWindow(width, height)
 		borderchars = { "a", "b", "c", "d", "e", "f", "g", "h" },
 	}
 
-	local win_id, opts = popup.create("", options)
+	local win_id, win_opts = popup.create("", options)
 	local buf = vim.api.nvim_win_get_buf(win_id)
-	print(win_id .. " " .. buf)
+	print(buf)
 	vim.api.nvim_buf_set_name(buf, "_JustInputPrompt")
-	vim.api.nvim_buf_set_name(opts.border.bufnr, "_JustInputPromptBorder")
-	-- vim.api.nvim_win_set_option(win_id, "winblend", opts.winblend)
+	vim.api.nvim_buf_set_name(win_opts.border.bufnr, "_JustInputPromptBorder")
+	vim.api.nvim_win_set_option(win_id, "winhl", "Normal:" .. opts.normal_hl)
+	vim.api.nvim_win_set_option(win_opts.border.win_id, "winhl", "Normal:" .. opts.border_hl)
+	vim.api.nvim_win_set_option(win_id, "winblend", opts.winblend)
 	vim.api.nvim_win_set_option(win_id, "foldenable", false)
 
-	-- vim.api.nvim_create_autocmd("BufLeave", {
-	-- 	buffer = buf,
-	-- 	once = true,
-	-- 	callback = function()
-	-- 		pcall(vim.api.nvim_win_close, win_id, true)
-	-- 		pcall(vim.api.nvim_win_close, opts.border.win_id, true)
-	-- 		M.deleteBuffer(buf)
-	-- 	end,
-	-- })
+	vim.api.nvim_create_autocmd("BufLeave", {
+		buffer = buf,
+		once = true,
+		callback = function()
+			pcall(vim.api.nvim_win_close, win_id, true)
+			pcall(vim.api.nvim_win_close, opts.border.win_id, true)
+			M.deleteBuffer(buf)
+		end,
+	})
 
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "123456" })
 
