@@ -1,3 +1,6 @@
+local strings = require("plenary.strings")
+local popup = require("plenary.popup")
+
 local M = {}
 
 ---Helper to print a table.
@@ -97,59 +100,117 @@ function M.clearFile(file)
 	end
 end
 
-function M.openFloatingWindow()
-	-- TODO: some parts of this function can be extracted
-	local ui = vim.api.nvim_list_uis()[1]
-
-	if not ui then
-		vim.notify("could not retrieve the dimensions of the current ui!")
-		return
+function M.repeatedTable(n, val)
+	local empty_lines = {}
+	for _ = 1, n do
+		table.insert(empty_lines, val)
 	end
 
-	local win_width = 50
-	local win_height = 10
+	return empty_lines
+end
 
-	local win_row = math.floor((ui.height - win_height) / 2)
-	local win_col = math.floor((ui.width - win_width) / 2)
-
-	local options = {
-		relative = "editor",
-		width = win_width,
-		height = win_height,
-		row = win_row,
-		col = win_col,
-		anchor = "NW",
-		style = "minimal",
-	}
-
-	-- create a new buffer
-	local buf = vim.api.nvim_create_buf(false, true)
-
+function M.setBorder(buffer, width, height)
 	-- TODO make border configurable
 	-- set the border
-	local border_char = "─"
+	local border_char_horizontal = "─"
+	local border_char_vertical = "│"
+	local border_char_top_left = "╭"
+	local border_char_top_right = "╮"
+	local border_char_bottom_left = "╰"
+	local border_char_bottom_right = "╯"
+	-- local border_hl = "Comment"
 	local lines = {}
 
+	local top_line = border_char_top_left .. string.rep(border_char_horizontal, width - 2) .. border_char_top_right
 	-- add top border
-	local top_line = "╭" .. string.rep(border_char, win_width - 2) .. "╮"
-	local middle_line = "│" .. string.rep(" ", win_width - 2) .. "│"
-	local bottom_line = "╰" .. string.rep(border_char, win_width - 2) .. "╯"
+	local middle_line = border_char_vertical .. string.rep(" ", width - 2) .. border_char_vertical
+	local bottom_line = border_char_bottom_left
+		.. string.rep(border_char_horizontal, width - 2)
+		.. border_char_bottom_right
 
 	table.insert(lines, top_line)
-	for _ = 2, win_height - 1 do
+	for _ = 2, height - 1 do
 		table.insert(lines, middle_line)
 	end
 	table.insert(lines, bottom_line)
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 
-	vim.api.nvim_open_win(buf, true, options)
+	-- prepar buffer with filling all the lines
+	local fill_char = "/"
+	vim.api.nvim_buf_set_lines(
+		buffer,
+		0,
+		-1,
+		false,
+		M.repeatedTable(height, table.concat(M.repeatedTable(width, fill_char), ""))
+	)
+
+	local anon_ns = vim.api.nvim_create_namespace("")
+
+	vim.api.nvim_buf_set_extmark(buffer, anon_ns, 0, 0, { end_line = height, hl_group = "JustMessageFillChar" })
+
+	local col = math.floor((width - strings.strdisplaywidth(lines[2])) / 2)
+end
+
+function M.openFloatingWindow(width, height)
+	local options = {
+		title = { { text = "test title", pos = "S" } },
+		relative = "editor",
+		enter = false,
+		width = width,
+		height = height,
+		line = 1,
+		col = 0,
+		noautocmd = true,
+		border = { 1, 0, 0, 0 },
+		borderchars = { "a", "b", "c", "d", "e", "f", "g", "h" },
+	}
+
+	local win_id, opts = popup.create("", options)
+	local buf = vim.api.nvim_win_get_buf(win_id)
+	print(win_id .. " " .. buf)
+	vim.api.nvim_buf_set_name(buf, "_JustInputPrompt")
+	vim.api.nvim_buf_set_name(opts.border.bufnr, "_JustInputPromptBorder")
+	-- vim.api.nvim_win_set_option(win_id, "winblend", opts.winblend)
+	vim.api.nvim_win_set_option(win_id, "foldenable", false)
+
+	-- vim.api.nvim_create_autocmd("BufLeave", {
+	-- 	buffer = buf,
+	-- 	once = true,
+	-- 	callback = function()
+	-- 		pcall(vim.api.nvim_win_close, win_id, true)
+	-- 		pcall(vim.api.nvim_win_close, opts.border.win_id, true)
+	-- 		M.deleteBuffer(buf)
+	-- 	end,
+	-- })
+
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "123456" })
 
 	return buf
 end
 
+function M.deleteBuffer(buffer)
+	if buffer == nil then
+		return false
+	else
+		-- Suppress the buffer deleted message for those with &report<2
+		local start_report = vim.o.report
+		if start_report < 2 then
+			vim.o.report = 2
+		end
+
+		if vim.api.nvim_buf_is_valid(buffer) and vim.api.nvim_buf_is_loaded(buffer) then
+			vim.api.nvim_buf_delete(buffer, { force = true })
+		end
+
+		if start_report < 2 then
+			vim.o.report = start_report
+		end
+	end
+end
+
 function M.openInput()
 	-- TODO pass on actions and data to the floating window
-	M.openFloatingWindow()
+	M.openFloatingWindow(50, 10)
 end
 
 return M
