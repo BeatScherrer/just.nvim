@@ -109,70 +109,27 @@ function M.repeatedTable(n, val)
 	return empty_lines
 end
 
-function M.setBorder(buffer, width, height)
-	-- TODO make border configurable
-	-- set the border
-	local border_char_horizontal = "─"
-	local border_char_vertical = "│"
-	local border_char_top_left = "╭"
-	local border_char_top_right = "╮"
-	local border_char_bottom_left = "╰"
-	local border_char_bottom_right = "╯"
-	-- local border_hl = "Comment"
-	local lines = {}
-
-	local top_line = border_char_top_left .. string.rep(border_char_horizontal, width - 2) .. border_char_top_right
-	-- add top border
-	local middle_line = border_char_vertical .. string.rep(" ", width - 2) .. border_char_vertical
-	local bottom_line = border_char_bottom_left
-		.. string.rep(border_char_horizontal, width - 2)
-		.. border_char_bottom_right
-
-	table.insert(lines, top_line)
-	for _ = 2, height - 1 do
-		table.insert(lines, middle_line)
-	end
-	table.insert(lines, bottom_line)
-
-	-- prepar buffer with filling all the lines
-	local fill_char = "/"
-	vim.api.nvim_buf_set_lines(
-		buffer,
-		0,
-		-1,
-		false,
-		M.repeatedTable(height, table.concat(M.repeatedTable(width, fill_char), ""))
-	)
-
-	local anon_ns = vim.api.nvim_create_namespace("")
-
-	vim.api.nvim_buf_set_extmark(buffer, anon_ns, 0, 0, { end_line = height, hl_group = "JustMessageFillChar" })
-
-	local col = math.floor((width - strings.strdisplaywidth(lines[2])) / 2)
-end
-
 function M.openFloatingWindow(width, height, opts)
 	opts = opts or {}
 	opts.normal_hl = vim.F.if_nil(opts.normal_hl, "JustPrompt")
 	opts.border_hl = vim.F.if_nil(opts.border_hl, "JustPromptBorder")
 	opts.winblend = vim.F.if_nil(opts.winblend, 1)
 
-	local options = {
-		title = { { text = "test title", pos = "S" } },
+	local popup_opts = {
+		title = { { text = "Just input prompt", pos = "S" } },
 		relative = "editor",
-		enter = false,
-		width = width,
-		height = height,
-		line = 1,
+		enter = true,
+		minheight = height,
+		minwidth = width,
+		line = 0,
 		col = 0,
 		noautocmd = true,
-		border = { 1, 0, 0, 0 },
-		borderchars = { "a", "b", "c", "d", "e", "f", "g", "h" },
+		border = { 1, 1, 1, 1 },
+		borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
 	}
 
-	local win_id, win_opts = popup.create("", options)
+	local win_id, win_opts = popup.create("", popup_opts)
 	local buf = vim.api.nvim_win_get_buf(win_id)
-	print(buf)
 	vim.api.nvim_buf_set_name(buf, "_JustInputPrompt")
 	vim.api.nvim_buf_set_name(win_opts.border.bufnr, "_JustInputPromptBorder")
 	vim.api.nvim_win_set_option(win_id, "winhl", "Normal:" .. opts.normal_hl)
@@ -185,12 +142,12 @@ function M.openFloatingWindow(width, height, opts)
 		once = true,
 		callback = function()
 			pcall(vim.api.nvim_win_close, win_id, true)
-			pcall(vim.api.nvim_win_close, opts.border.win_id, true)
+			pcall(vim.api.nvim_win_close, win_opts.border.win_id, true)
 			M.deleteBuffer(buf)
 		end,
 	})
 
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "123456" })
+	-- vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "123456", "12", "123" })
 
 	return buf
 end
