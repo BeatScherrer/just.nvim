@@ -109,27 +109,31 @@ function M.repeatedTable(n, val)
 	return empty_lines
 end
 
-function M.openFloatingWindow(width, height, opts)
+function M.openFloatingWindow(width, height, opts, fillchar)
+	-- Add a default parameters
+	fillchar = vim.F.if_nil(fillchar, "/")
 	opts = opts or {}
 	opts.normal_hl = vim.F.if_nil(opts.normal_hl, "JustPrompt")
 	opts.border_hl = vim.F.if_nil(opts.border_hl, "JustPromptBorder")
 	opts.winblend = vim.F.if_nil(opts.winblend, 1)
+	opts.border = vim.F.if_nil(opts.border, 0)
 
 	local popup_opts = {
-		title = { { text = "Just input prompt", pos = "S" } },
+		title = { { text = "Just input prompt", pos = "N" } },
 		relative = "editor",
-		enter = true,
+		enter = opts.enter,
 		minheight = height,
 		minwidth = width,
 		noautocmd = true,
-		border = { 0, 0, 0, 0 },
+		border = { opts.border, opts.border, opts.border, opts.border },
 		borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+		focusable = 1,
 	}
 
 	local win_id, win_opts = popup.create("", popup_opts)
 	local buf = vim.api.nvim_win_get_buf(win_id)
-	vim.api.nvim_buf_set_name(buf, "_JustInputPrompt")
-	vim.api.nvim_buf_set_name(win_opts.border.bufnr, "_JustInputPromptBorder")
+	-- vim.api.nvim_buf_set_name(buf, "_JustInputPrompt")
+	-- vim.api.nvim_buf_set_name(win_opts.border.bufnr, "_JustInputPromptBorder")
 	vim.api.nvim_win_set_option(win_id, "winhl", "Normal:" .. opts.normal_hl)
 	vim.api.nvim_win_set_option(win_opts.border.win_id, "winhl", "Normal:" .. opts.border_hl)
 	vim.api.nvim_win_set_option(win_id, "winblend", opts.winblend)
@@ -144,8 +148,6 @@ function M.openFloatingWindow(width, height, opts)
 			M.deleteBuffer(buf)
 		end,
 	})
-
-	-- vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "123456", "12", "123" })
 
 	return win_id, win_opts
 end
@@ -172,7 +174,27 @@ end
 
 function M.openInput()
 	-- TODO pass on actions and data to the floating window
-	M.openFloatingWindow(50, 10)
+	local popupWindow, _ = M.openFloatingWindow(50, 5, { border = 1, enter = 0 })
+	local promptWindow, _ = M.openFloatingWindow(20, 1, { border = 1, enter = 1 })
+
+	local popupBuf = vim.api.nvim_win_get_buf(popupWindow)
+	local promptBuf = vim.api.nvim_win_get_buf(promptWindow)
+
+	print("popupBuf: " .. popupBuf)
+	print("promptBuf: " .. promptBuf)
+
+	-- close all windows when the prompt buffer is left
+	vim.api.nvim_create_autocmd("BufLeave", {
+		buffer = promptBuf,
+		once = true,
+		callback = function()
+			pcall(vim.api.nvim_win_close, popupWindow, true)
+			pcall(vim.api.nvim_win_close, promptWindow, true)
+			-- pcall(vim.api.nvim_buf_delete(popupBuf, {}))
+			-- pcall(vim.api.nvim_buf_delete(promptBuf, {}))
+			-- TODO: Do we need to delete the buffers here??
+		end,
+	})
 end
 
 return M

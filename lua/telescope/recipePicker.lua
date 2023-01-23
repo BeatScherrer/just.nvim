@@ -71,11 +71,14 @@ M.recipePicker = function(opts)
 
 					local arguments = {}
 					for _, v in ipairs(selection.value.arguments) do
-						local argument = utils.openInput()
+						-- TODO: enable input popup configurable
+						-- local argument = utils.openInput()
+						local argument = vim.fn.input(v .. ": ")
+
 						arguments[v] = argument
 					end
 
-					-- jobs.justRunAsync(selection[1])
+					jobs.justRunAsync(selection.value.name, arguments)
 				end)
 				return true
 			end,

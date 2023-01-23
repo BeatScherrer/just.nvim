@@ -58,19 +58,33 @@ end
 ---@param recipeName any Recipe name to run.
 ---@param autoStart any Whether the job should ran automatically (default=true)
 ---@return unknown Job handle
-M.justRunAsync = function(recipeName, autoStart)
+M.justRunAsync = function(recipeName, recipeArgs, autoStart)
+	-- TODO: pass a recipe in the following structure {name: ..., args: { argName: Value}}
+
 	if autoStart == nil then
 		autoStart = true
 	end
+
+	recipeArgs = recipeArgs or {}
 
 	-- TODO make this
 	local filename = "/tmp/just_" .. recipeName .. ".txt"
 
 	utils.clearFile(filename)
 
+	local justArgs = {}
+	table.insert(justArgs, recipeName)
+	-- utils.printTable(args)
+
+	for _, v in pairs(recipeArgs) do
+		table.insert(justArgs, v)
+	end
+
+	utils.printTable(justArgs)
+
 	local job = Job:new({
 		command = "just",
-		args = { recipeName },
+		args = justArgs,
 		on_stdout = vim.schedule_wrap(function(_, lines)
 			utils.appendToFile(filename, lines)
 		end),
