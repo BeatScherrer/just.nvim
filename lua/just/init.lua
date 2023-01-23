@@ -40,12 +40,18 @@ M.setup = function(_)
 			return
 		end
 
-		-- TODO handle multiple arguments
+		local recipeArgs = {}
 		local recipeName = args.fargs[1]
+
+		for i, v in pairs(args.fargs) do
+			if i > 1 then
+				table.insert(recipeArgs, v)
+			end
+		end
 
 		utils.clearQuickfix()
 		utils.setQuickfixTitle("Just recipe: " .. args.fargs[1])
-		jobs.justRunAsync(recipeName, true)
+		jobs.justRunAsync(recipeName, recipeArgs)
 	end, {
 		nargs = "*",
 		complete = completeRecipe,
