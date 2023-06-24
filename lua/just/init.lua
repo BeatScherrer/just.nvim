@@ -42,6 +42,10 @@ M.setup = function(_)
 
 		-- TODO handle multiple arguments
 		local recipeName = args.fargs[1]
+        if recipeName == "--use-filename" then
+            recipeName = utils.getFilename(vim.api.nvim_buf_get_name(0))
+            jobs.justRunAsync(recipeName, true)
+        end
 
 		utils.clearQuickfix()
 		utils.setQuickfixTitle("Just recipe: " .. args.fargs[1])

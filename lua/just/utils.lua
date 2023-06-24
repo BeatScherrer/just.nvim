@@ -97,4 +97,9 @@ function M.clearFile(file)
 	end
 end
 
+---Extracts a filename from a full path without the extension
+---@param path string Path to the file
+function M.getFilename(path)
+    return path:match(".+/(.-)%..+$") or path
+end
 return M
