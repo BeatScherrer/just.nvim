@@ -32,6 +32,17 @@ set up the plugin:
 require("just").setup()
 ```
 
+### Lazy
+Add a file with the following content in the `plugins` directory of `lazy`.
+
+Define an empty `opts`.
+```
+return {
+  "BeatScherrer/just.nvim",
+  opts = { },
+}
+```
+
 ### Telescope extension
 
 This plugin comes with a telescope extension. This allows to pick the recipe in a telescope picker and run them directly.
