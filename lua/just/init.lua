@@ -36,6 +36,7 @@ M.setup = function(_)
 	vim.api.nvim_create_user_command("Just", function(args)
 		-- No parameter passed
 		if not args.fargs[1] then
+      -- TODO: open prompt to select the recipe of none is passed
 			utils.printTable(jobs.justList())
 			return
 		end
