@@ -11,7 +11,6 @@ M.justSummary = function()
 		command = "just",
 		args = { "--summary" },
 	}):sync()
-	utils.printTable(justRecipes)
 	return utils.splitString(justRecipes[1], " ")
 end
 
