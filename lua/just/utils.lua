@@ -1,13 +1,8 @@
 local strings = require("plenary.strings")
 local popup = require("plenary.popup")
+local log = require("just.log")
 
 local M = {}
-
----Helper to print a table.
----@param argument table Table to print.
-function M.printTable(argument)
-    print(vim.inspect(argument))
-end
 
 ---Runs a vim command silently and redraws.
 ---@param command string Vim command to execute.
@@ -87,7 +82,7 @@ function M.appendToFile(file, arg)
         out:write("\n")
         out:close()
     else
-        vim.notify("could not open file: " .. file)
+        log.warn("could not open file: " .. file)
     end
 end
 
@@ -195,6 +190,30 @@ function M.openInput()
             -- TODO: Do we need to delete the buffers here??
         end,
     })
+end
+
+--- Gets the basename of a path.
+-- That is the file name without the extension.
+---@param path string Path of the file to get the basename for.
+---@return string Basename of the file.
+function M.basename(path)
+    return path:match(".+/(.-)%..+$") or path
+end
+
+--- Retrieves a recipe by its name.
+---@param name string Name of the recipe to get.
+---@return table? Recipe with the requested name.
+function M.getRecipeByName(name)
+    local jobs = require("just.jobs")
+    local recipes = jobs.justList()
+
+    for _, v in pairs(recipes) do
+        if name == v.name then
+            return v
+        end
+    end
+
+    return nil
 end
 
 return M

@@ -14,6 +14,7 @@
 local jobs = require("just.jobs")
 
 local utils = require("just.utils")
+local log = require("just.log")
 
 local M = {}
 
@@ -37,7 +38,9 @@ M.setup = function(_)
         -- No parameter passed
         if not args.fargs[1] then
             -- TODO: add recipe selection picker here in case telescope is installed
-            utils.printTable(jobs.justList())
+            -- vim.pretty_print(jobs.justList())
+
+            log.error("please select a valid just recipe")
             return
         end
 
@@ -57,6 +60,26 @@ M.setup = function(_)
         nargs = "*",
         complete = completeRecipe,
     })
+
+    vim.api.nvim_create_user_command("JustBasename", function()
+        local recipeArgs = {}
+        local recipeName = utils.basename(vim.api.nvim_buf_get_name(0))
+
+        -- get the recipe
+        local recipe = utils.getRecipeByName(recipeName)
+
+        if not recipe then
+            log.error("could not get recipe with current basename '" .. recipeName .. "'")
+            return
+        end
+
+        for _, v in ipairs(recipe.arguments) do
+            local argument = vim.fn.input(v .. ": ")
+            recipeArgs[v] = argument
+        end
+
+        jobs.justRunAsync(recipeName, recipeArgs, true)
+    end, {})
 end
 
 -- TODO: setup with options in user code instead of here
