@@ -74,13 +74,10 @@ M.justRunAsync = function(recipeName, recipeArgs, autoStart)
 
     local justArgs = {}
     table.insert(justArgs, recipeName)
-    -- utils.printTable(args)
 
     for _, v in pairs(recipeArgs) do
         table.insert(justArgs, v)
     end
-
-    utils.printTable(justArgs)
 
     local job = Job:new({
         command = "just",

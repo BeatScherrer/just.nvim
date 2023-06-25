@@ -7,6 +7,3 @@ build:
 
 test test_arg:
   echo "hello from test {{test_arg}}"
-
-lint: 
-  echo "hello from lint"

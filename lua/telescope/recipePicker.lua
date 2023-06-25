@@ -21,8 +21,6 @@ M.recipePicker = function(opts)
     for recipe, v in pairs(recipes) do
         local args = ""
 
-        -- utils.printTable(recipes)
-        -- utils.printTable(v.arguments)
         if #v.arguments ~= 0 then
             for _, arg in pairs(v.arguments) do
                 args = args .. " " .. arg

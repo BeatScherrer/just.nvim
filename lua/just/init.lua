@@ -36,6 +36,7 @@ M.setup = function(_)
     vim.api.nvim_create_user_command("Just", function(args)
         -- No parameter passed
         if not args.fargs[1] then
+            -- TODO: add recipe selection picker here in case telescope is installed
             utils.printTable(jobs.justList())
             return
         end
