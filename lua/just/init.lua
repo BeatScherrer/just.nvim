@@ -18,39 +18,39 @@ local utils = require("just.utils")
 local M = {}
 
 local function completeRecipe(args)
-	-- Match the command line arguments to all the available recipes and sugges
-	-- those that contain the arguments
-	local suggestionList = {}
-	local justRecipes = jobs.justSummary()
+    -- Match the command line arguments to all the available recipes and sugges
+    -- those that contain the arguments
+    local suggestionList = {}
+    local justRecipes = jobs.justSummary()
 
-	for _, recipe in pairs(justRecipes) do
-		if string.find(recipe, args) then
-			table.insert(suggestionList, recipe)
-		end
-	end
+    for _, recipe in pairs(justRecipes) do
+        if string.find(recipe, args) then
+            table.insert(suggestionList, recipe)
+        end
+    end
 
-	return suggestionList
+    return suggestionList
 end
 
 M.setup = function(_)
-	vim.api.nvim_create_user_command("Just", function(args)
-		-- No parameter passed
-		if not args.fargs[1] then
-      -- TODO: open prompt to select the recipe of none is passed
-			utils.printTable(jobs.justList())
-			return
-		end
+    vim.api.nvim_create_user_command("Just", function(args)
+        -- No parameter passed
+        if not args.fargs[1] then
+            -- TODO: open prompt to select the recipe of none is passed instead
+            -- utils.printTable(jobs.justList())
+            return
+        end
 
-		-- TODO handle multiple arguments
-		local recipeName = args.fargs[1]
+        -- TODO handle multiple arguments
+        local recipeName = args.fargs[1]
 
-		utils.clearQuickfix()
-		utils.setQuickfixTitle("Just recipe: " .. args.fargs[1])
-		jobs.justRunAsync(recipeName, true)
-	end, {
-		nargs = "*",
-		complete = completeRecipe,
-	})
+        utils.clearQuickfix()
+        utils.setQuickfixTitle("Just recipe: " .. args.fargs[1])
+        jobs.justRunAsync(recipeName, true)
+    end, {
+        nargs = "*",
+        complete = completeRecipe,
+    })
 end
 
 return M
