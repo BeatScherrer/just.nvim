@@ -18,44 +18,44 @@ local utils = require("just.utils")
 local M = {}
 
 local function completeRecipe(args)
-	-- Match the command line arguments to all the available recipes and sugges
-	-- those that contain the arguments
-	local suggestionList = {}
-	local justRecipes = jobs.justSummary()
+    -- Match the command line arguments to all the available recipes and sugges
+    -- those that contain the arguments
+    local suggestionList = {}
+    local justRecipes = jobs.justSummary()
 
-	for _, recipe in pairs(justRecipes) do
-		if string.find(recipe, args) then
-			table.insert(suggestionList, recipe)
-		end
-	end
+    for _, recipe in pairs(justRecipes) do
+        if string.find(recipe, args) then
+            table.insert(suggestionList, recipe)
+        end
+    end
 
-	return suggestionList
+    return suggestionList
 end
 
 M.setup = function(_)
-	vim.api.nvim_create_user_command("Just", function(args)
-		-- No parameter passed
-		if not args.fargs[1] then
-			utils.printTable(jobs.justList())
-			return
-		end
+    vim.api.nvim_create_user_command("Just", function(args)
+        -- No parameter passed
+        if not args.fargs[1] then
+            utils.printTable(jobs.justList())
+            return
+        end
 
-		local recipeArgs = {}
-		local recipeName = args.fargs[1]
+        local recipeArgs = {}
+        local recipeName = args.fargs[1]
 
-		for i, v in pairs(args.fargs) do
-			if i > 1 then
-				table.insert(recipeArgs, v)
-			end
-		end
+        for i, v in pairs(args.fargs) do
+            if i > 1 then
+                table.insert(recipeArgs, v)
+            end
+        end
 
-		utils.clearQuickfix()
-		utils.setQuickfixTitle("Just recipe: " .. args.fargs[1])
-		jobs.justRunAsync(recipeName, recipeArgs)
-	end, {
-		nargs = "*",
-		complete = completeRecipe,
-	})
+        utils.clearQuickfix()
+        utils.setQuickfixTitle("Just recipe: " .. args.fargs[1])
+        jobs.justRunAsync(recipeName, recipeArgs)
+    end, {
+        nargs = "*",
+        complete = completeRecipe,
+    })
 end
 
 -- TODO: setup with options in user code instead of here
