@@ -40,13 +40,12 @@ M.justList = function()
             comment = utils.trimLeadingWhitespace(recipe_parts[2])
         end
 
+        -- split the recipe 'signature'
         recipe_parts = utils.splitString(recipe_parts[1], " ")
         local recipe_name = recipe_parts[1]
         local arguments = {unpack(recipe_parts, 2)}
 
-        -- add the recipe table
         local recipe = { name = recipe_name, arguments = arguments, comment = comment }
-
         table.insert(justRecipes, recipe)
     end
 
