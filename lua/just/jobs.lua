@@ -19,7 +19,6 @@ end
 ---Returns a list with the available just recipes.
 ---@return table of the just recipe names together with the arguments.
 M.justList = function()
-    -- TODO: this could probably be done more elegantly
     local justRecipes = {}
 
     local list = Job:new({
@@ -43,7 +42,6 @@ M.justList = function()
 
         recipe_parts = utils.splitString(recipe_parts[1], " ")
         local recipe_name = recipe_parts[1]
-        -- TODO: parse all the arguments
         local arguments = {unpack(recipe_parts, 2)}
 
         -- add the recipe table
@@ -61,15 +59,12 @@ end
 ---@param autoStart any Whether the job should ran automatically (default=true)
 ---@return unknown Job handle
 M.justRunAsync = function(recipeName, recipeArgs, autoStart)
-    -- TODO: pass a recipe in the following structure {name: ..., args: { argName: Value}}
-
     if autoStart == nil then
         autoStart = true
     end
 
     recipeArgs = recipeArgs or {}
 
-    -- TODO make this
     local filename = "/tmp/just_" .. recipeName .. ".txt"
 
     utils.clearFile(filename)
