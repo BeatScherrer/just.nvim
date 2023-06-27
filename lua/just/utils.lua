@@ -29,6 +29,34 @@ function M.splitString(input, separator)
     return words
 end
 
+--- Trims leading whitespaces of an input string
+---@param input string to trim.
+---@return string Trimmed input string
+function M.trimLeadingWhitespace(input)
+  local leading_ws = string.match(input, "^%s+")
+  return string.sub(input, #leading_ws + 1)
+end
+
+--- Flattens a table to a string.
+---@param tbl table to flatten
+---@return string of the flattened table.
+function M.flattenTable(tbl)
+  local result = {}
+
+  local function flattenHelper(subTable)
+    for _, v in pairs(subTable) do
+      if type(v) == "table" then
+        flattenHelper(v)
+      else
+        result[#result + 1] = tostring(v)
+      end
+    end
+  end
+
+  flattenHelper(tbl)
+  return table.concat(result, " ")
+end
+
 ---Opens the quickfix window.
 ---@param filename string Optional name of the error file.
 function M.openQuickfix(filename)

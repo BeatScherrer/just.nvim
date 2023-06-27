@@ -1,4 +1,6 @@
+local log = require("just.log")
 local utils = require("just.utils")
+
 local Job = require("plenary.job")
 
 local M = {}
@@ -15,7 +17,7 @@ M.justSummary = function()
 end
 
 ---Returns a list with the available just recipes.
----@return List of the just recipe names together with the arguments.
+---@return table of the just recipe names together with the arguments.
 M.justList = function()
     -- TODO: this could probably be done more elegantly
     local justRecipes = {}
@@ -28,29 +30,29 @@ M.justList = function()
     -- remove first entry with 'Available recipes':
     table.remove(list, 1)
 
-    for i, v in pairs(list) do
-        local leading_ws = string.match(v, "^%s+")
-        v = string.sub(v, #leading_ws + 1)
+    for _, v in pairs(list) do
+        local comment = ""
 
-        -- split the sanitized string again to get the arguments
-        local recipe_parts = utils.splitString(v, " ")
+        v = utils.trimLeadingWhitespace(v)
+
+       -- split off the comments
+        local recipe_parts = utils.splitString(v, "#")
+        if #recipe_parts > 1 then
+            comment = utils.trimLeadingWhitespace(recipe_parts[2])
+        end
+
+        recipe_parts = utils.splitString(recipe_parts[1], " ")
         local recipe_name = recipe_parts[1]
+        -- TODO: parse all the arguments
+        local arguments = {unpack(recipe_parts, 2)}
 
         -- add the recipe table
-        local recipe = { name = recipe_name, arguments = {} }
-
-        -- add the arguments to the recipe
-        for i, word in pairs(recipe_parts) do
-            if i ~= 1 then
-                table.insert(recipe.arguments, word)
-            end
-        end
+        local recipe = { name = recipe_name, arguments = arguments, comment = comment }
 
         table.insert(justRecipes, recipe)
     end
 
-    -- we want an array with a table for each recipe holding keys with: name, arguments, etc.
-
+    log.debug(vim.inspect(justRecipes), {})
     return justRecipes
 end
 

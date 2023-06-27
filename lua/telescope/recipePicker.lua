@@ -7,6 +7,7 @@ local action_state = require("telescope.actions.state")
 
 local jobs = require("just.jobs")
 local utils = require("just.utils")
+local log = require("just.log")
 
 local M = {}
 
@@ -16,37 +17,18 @@ M.recipePicker = function(opts)
     -- get the recipes
     local recipes = jobs.justList()
 
-    -- construct a list of recipes together with the arguments
-    local recipeList = {}
-    for recipe, v in pairs(recipes) do
-        local args = ""
-
-        if #v.arguments ~= 0 then
-            for _, arg in pairs(v.arguments) do
-                if arg == "#" then
-                    break
-                end
-                args = args .. " " .. arg
-            end
-            table.insert(recipeList, recipe .. ": " .. args)
-        else
-            table.insert(recipeList, recipe)
-        end
-    end
-
     local entry_maker = function(entry)
-        local arguments = ""
-        for _, v in ipairs(entry.arguments) do
-            arguments = arguments .. " " .. v
+        local value = entry
+        local display = entry.name
+
+        if entry.arguments then
+            if #entry.arguments > 0 then
+                display = display .. ": " .. utils.flattenTable(entry.arguments)
+            end
         end
 
-        local value = entry
-        local display = ""
-
-        if #entry.arguments ~= 0 then
-            display = entry.name .. ": " .. arguments
-        else
-            display = entry.name
+        if string.len(entry.comment) > 0 then
+            display = display .. " # " .. entry.comment
         end
 
         return {
