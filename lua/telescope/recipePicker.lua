@@ -23,6 +23,9 @@ M.recipePicker = function(opts)
 
         if #v.arguments ~= 0 then
             for _, arg in pairs(v.arguments) do
+                if arg == "#" then
+                    break
+                end
                 args = args .. " " .. arg
             end
             table.insert(recipeList, recipe .. ": " .. args)
